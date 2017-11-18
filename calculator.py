@@ -1,76 +1,47 @@
-from itertools import permutations, combinations_with_replacement
-from operator import add, sub, mul
+from itertools import product
+from functools import reduce
+from buttons import create_button, NonIntegerDivisionError
 
-class NonIntegerDivision(Exception):
+
+class SolutionDoesNotExistError:
     pass
 
-def division(n, k):
-    if n % k == 0:
-        return n // k
-    else:
-        raise NonIntegerDivision
 
-def variations_with_replacement(iterable, r):
-    for comb in combinations_with_replacement(iterable, r):
-        for perm in permutations(comb):
-            yield perm
+def compute(start, seq_of_buttons):
+    return reduce(lambda x, f: f(x), seq_of_buttons, start)
 
-OPS = {'+': add, '-': sub, '*': mul, '/': division}
 
-def create_button(s):
-    if s == '^2':
-        def f(x):
-            return x * x
-    elif s == '+/-':
-        def f(x):
-            return -x
-    elif s == '<<':
-        def f(x):
-            return int(str(x)[:-1])
-    elif s[0] in OPS.keys():
-        d, c = s[0], int(s[1:])
-        def f(x):
-            return OPS[d](x, c)
-    elif '=>' in s:
-        a, b = s.split('=>')
-        def f(x):
-            return int(str(x).replace(a, b))
-    else:
-        c = int(s)
-        def f(x):
-            return int('{}{}'.format(x, c))
-    return f
-
-def compute(x, buttons, funcs):
-    for button in buttons:
-        try:
-            x = funcs[button](x)
-        except NonIntegerDivision:
-            raise
-    return x
-
-class Calculator:
+class CalculatorTheGame:
     
     def __init__(self, start, goal, moves):
         self.start = start
         self.goal = goal
         self.moves = moves
         self._buttons = {}
-        self._solutions = []
+        self._solution = None
     
-    def add_buttons(self, *buttons):
-        for button in buttons:
-            self._buttons[button] = create_button(button)
+    def add_buttons(self, *signs):
+        for sign in signs:
+            self._buttons[sign] = create_button(sign)
     
-    def solve(self, all=False):
-        for v in variations_with_replacement(self._buttons, self.moves):
+    def solve(self, find_all=False):
+        if find_all:
+            solutions = set()
+        for signs in product(self._buttons, repeat=self.moves):
+            btns = (self._buttons[sign] for sign in signs)
             try:
-                out = compute(self.start, v, self._buttons)
-            except NonIntegerDivision:
+                out = compute(self.start, btns)
+            except NonIntegerDivisionError:
                 continue
             if self.goal == out:
-                if all:
-                    self._solutions.append(v)
+                self._solution = signs
+                if find_all:
+                    solutions.add(signs)
                 else:
-                    return v
-        return set(self._solutions)
+                    return signs
+        return solutions
+    
+    def hint(self, number_of_hints=1):
+        if not self._solution:
+            self._solution = self.solve()
+        return self._solution[:number_of_hints]
