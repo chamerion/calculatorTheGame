@@ -3,44 +3,49 @@ from functools import reduce
 from buttons import create_button, NonIntegerDivisionError
 
 
-class SolutionDoesNotExistError:
+class SolutionDoesNotExistError(Exception):
     pass
 
 
-def compute(start, seq_of_buttons):
+def final_value(start, seq_of_buttons):
     return reduce(lambda x, f: f(x), seq_of_buttons, start)
 
 
+def solve(start, goal, moves, buttons_by_sign):
+    for signs in product(buttons_by_sign, repeat=moves):
+        seq_of_buttons = (buttons_by_sign[sign] for sign in signs)
+        try:
+            out = final_value(start, seq_of_buttons)
+        except NonIntegerDivisionError:
+            continue
+        if goal == out:
+            yield signs
+
+
 class CalculatorTheGame:
-    
+
     def __init__(self, start, goal, moves):
         self.start = start
         self.goal = goal
         self.moves = moves
         self._buttons = {}
         self._solution = None
-    
+
     def add_buttons(self, *signs):
         for sign in signs:
             self._buttons[sign] = create_button(sign)
-    
+
     def solve(self, find_all=False):
+        solutions_gen = solve(self.start, self.goal, self.moves, self._buttons)
         if find_all:
-            solutions = set()
-        for signs in product(self._buttons, repeat=self.moves):
-            btns = (self._buttons[sign] for sign in signs)
+            return set(solutions_gen)
+        else:
             try:
-                out = compute(self.start, btns)
-            except NonIntegerDivisionError:
-                continue
-            if self.goal == out:
-                self._solution = signs
-                if find_all:
-                    solutions.add(signs)
-                else:
-                    return signs
-        return solutions
-    
+                self._solution = next(solutions_gen)
+            except StopIteration:
+                raise SolutionDoesNotExistError
+            return self._solution
+
     def hint(self, number_of_hints=1):
         if not self._solution:
             self._solution = self.solve()

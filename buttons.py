@@ -18,14 +18,25 @@ class ItIsNotaButtonError(Exception):
     pass
 
 
-class ButtonFactory:
-    
+class Button:
+
     def __init__(self, *parameters, op):
         self.parameters = tuple(int(p) for p in parameters) if parameters else ()
         self.op = op
-    
+        self.as_string = None
+
     def __call__(self, *args):
         return self.op(*args, *self.parameters)
+
+    def __str__(self):
+        return 'Button({})'.format(self.as_string)
+
+    def __repr__(self):
+        if not self.parameters:
+            return 'Button({})'.format(self.op.__name__)
+        else:
+            spar = ', '.join(str(p) for p in self.parameters)
+            return 'Button({}, {})'.format(spar, self.op.__name__)
 
 
 def add_cipher(k, n):
@@ -83,5 +94,7 @@ def create_button(s):
             d = match.groupdict()
             sign = d.pop('sign')
             parameters = (v for k, v in sorted(d.items()))
-            return ButtonFactory(*parameters, op=func_by_sign[sign])
+            button = Button(*parameters, op=func_by_sign[sign])
+            button.as_string = s
+            return button
     raise ItIsNotaButtonError
