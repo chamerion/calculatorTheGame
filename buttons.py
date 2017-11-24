@@ -65,13 +65,19 @@ def replace_ciphers(k, a, b):
     return int(str(k).replace(str(a), str(b)))
 
 
+def reverse(k):
+    s = str(k)
+    return int(s[::-1])
+
+
 EMPTY_STR = ''
 
 
 func_by_sign = {EMPTY_STR: add_cipher, '+': add, '-': sub,
                 '*': mul, '/': division,
                 '^2': square, '+/-': neg,
-                '<<': eat_cipher, '=>': replace_ciphers}
+                '<<': eat_cipher, '=>': replace_ciphers,
+                'reverse': reverse}
 
 regexs = (r'^(?P<sign>)(?P<n>\d+)$',
           r'^(?P<sign>\+)(?P<n>\d+)$',
@@ -81,7 +87,8 @@ regexs = (r'^(?P<sign>)(?P<n>\d+)$',
           r'^(?P<sign>\^2)$',
           r'^(?P<sign>\+/-)$',
           r'^(?P<sign><<)$',
-          r'^(?P<n1>\d+)(?P<sign>=>)(?P<n2>\d+)$')
+          r'^(?P<n1>\d+)(?P<sign>=>)(?P<n2>\d+)$',
+          r'^(?P<sign>reverse)$')
 
 compiled_regexs = tuple(re.compile(r) for r in regexs)
 
