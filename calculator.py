@@ -1,6 +1,7 @@
 from itertools import product
 from functools import reduce
-from buttons import create_button, NonIntegerDivisionError
+from ops import NonIntegerDivisionError
+from buttons import create_button
 
 
 class SolutionDoesNotExistError(Exception):
