@@ -37,24 +37,30 @@ def eat_cipher(k):
 
 
 def replace_ciphers(k, a, b):
+    if b < 0:
+        raise ValueError
     return int(str(k).replace(str(a), str(b)))
 
 
 def reverse(k):
     if k < 0:
         s = str(k)[1:]
-    else:
-        s = str(k)
+        return -int(s[::-1])
+    s = str(k)
     return int(s[::-1])
 
 
 EMPTY_STR = ''
 
-
-FUNC_BY_SIGN = {EMPTY_STR: add_cipher, '+': add, '-': sub,
-                '*': mul, '/': division,
-                '^2': square, '+/-': neg,
-                '<<': eat_cipher, '=>': replace_ciphers,
+FUNC_BY_SIGN = {EMPTY_STR: add_cipher,
+                '+': add,
+                '-': sub,
+                '*': mul,
+                '/': division,
+                '^2': square,
+                '+/-': neg,
+                '<<': eat_cipher,
+                '=>': replace_ciphers,
                 'reverse': reverse}
 
 REGEXS = (r'^(?P<sign>)(?P<n>\d+)$',
@@ -66,6 +72,6 @@ REGEXS = (r'^(?P<sign>)(?P<n>\d+)$',
           r'^(?P<sign>\+/-)$',
           r'^(?P<sign><<)$',
           r'^(?P<n1>\d+)(?P<sign>=>)(?P<n2>\d+)$',
-          r'^(?P<sign>reverse)$')
+          r'^(?P<sign>[rR][eE][vV][eE][rR][sS][eE])$')
 
 COMPILED_REGEXS = tuple(re.compile(r) for r in REGEXS)

@@ -34,7 +34,7 @@ class Button:
 
 
 def create_button(s):
-    s = s.strip()
+    s = s.strip().lower()
     for r in COMPILED_REGEXS:
         match = r.match(s)
         if match:
