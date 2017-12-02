@@ -9,10 +9,12 @@ class SolutionDoesNotExistError(Exception):
 
 
 def final_value(start, seq_of_buttons):
+    '''Returns result of application of sequence of funcs to starting value.'''
     return reduce(lambda x, f: f(x), seq_of_buttons, start)
 
 
 def solve(start, goal, moves, buttons_by_sign):
+    '''Generator of solutions of the puzzle.'''
     for signs in product(buttons_by_sign, repeat=moves):
         seq_of_buttons = (buttons_by_sign[sign] for sign in signs)
         try:

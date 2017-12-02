@@ -13,6 +13,7 @@ class ItIsNotaButtonError(Exception):
 
 
 class Button:
+    '''Returns button given by operator and parameters.'''
 
     def __init__(self, *parameters, op):
         self.parameters = tuple(int(p) for p in parameters) if parameters else ()
@@ -34,6 +35,7 @@ class Button:
 
 
 def create_button(s):
+    '''Returns Button instance from string s.'''
     s = s.strip().lower()
     for r in COMPILED_REGEXS:
         match = r.match(s)
