@@ -33,6 +33,12 @@ class CalculatorTheGame:
         self.moves = moves
         self._buttons = {}
         self._solution = None
+    
+    def __str__(self):
+        s = 'CalculatorTheGame(start={}, goal={}, moves={})\n' \
+            .format(self.start, self.goal, self.moves)
+        s += '\n'.join(map(str, self._buttons.values()))
+        return s
 
     def add_buttons(self, *signs):
         for sign in signs:
